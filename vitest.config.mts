@@ -4,8 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       include: ["src/**"],
-      reporter: ["html", "text", "lcov"],
+      reporter: ["html", "text", "json-summary"],
     },
-    execArgv: ["--expose-gc"],
   },
 });
