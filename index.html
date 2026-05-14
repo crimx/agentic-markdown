@@ -86,7 +86,7 @@
               ></a
             >
           </p>
-          <p>Render agent-specific Markdown from conditional HTML comment blocks.</p>
+          <p>Render variable-aware Markdown from conditional HTML comment blocks.</p>
           <h2 id="install" class="tsd-anchor-link">
             Install<a href="#install" aria-label="Permalink" class="tsd-anchor-icon"
               ><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a
@@ -102,12 +102,12 @@
             >
           </h2>
           <pre
-          ><code class="ts"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">render</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">markdown</span><span class="hl-1"> = </span><span class="hl-2">`Common content.</span><br/><br/><span class="hl-2">&lt;!-- agentic:if agent=codex --&gt;</span><br/><span class="hl-2">Codex-only content.</span><br/><span class="hl-2">&lt;!-- agentic:endif --&gt;</span><br/><br/><span class="hl-2">&lt;!-- agentic:if agent=claude,gemini --&gt;</span><br/><span class="hl-2">Claude and Gemini content.</span><br/><span class="hl-2">&lt;!-- agentic:endif --&gt;</span><br/><span class="hl-2">`</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">output</span><span class="hl-1"> = </span><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1">, </span><span class="hl-4">markdown</span><span class="hl-1">);</span>
+          ><code class="ts"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">render</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">markdown</span><span class="hl-1"> = </span><span class="hl-2">`Common content.</span><br/><br/><span class="hl-2">Project: &lt;!-- agentic:var projectName --&gt;</span><br/><br/><span class="hl-2">&lt;!-- agentic:if agent=codex --&gt;</span><br/><span class="hl-2">Codex-only content.</span><br/><span class="hl-2">&lt;!-- agentic:endif --&gt;</span><br/><br/><span class="hl-2">&lt;!-- agentic:if agent=claude|gemini --&gt;</span><br/><span class="hl-2">Claude and Gemini content.</span><br/><span class="hl-2">&lt;!-- agentic:endif --&gt;</span><br/><span class="hl-2">`</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">output</span><span class="hl-1"> = </span><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-4">agent:</span><span class="hl-1"> </span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">projectName:</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
 </code><button type="button">Copy</button></pre>
 
           <p><code>output</code>:</p>
           <pre
-          ><code class="md"><span class="hl-1">Common content.</span><br/><br/><span class="hl-1">Codex-only content.</span>
+          ><code class="md"><span class="hl-1">Common content.</span><br/><br/><span class="hl-1">Project: agentic-markdown</span><br/><br/><span class="hl-1">Codex-only content.</span>
 </code><button type="button">Copy</button></pre>
 
           <h2 id="syntax" class="tsd-anchor-link">
@@ -115,22 +115,39 @@
               ><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a
             >
           </h2>
-          <p>Use full-line HTML comments to mark agent-specific Markdown blocks:</p>
+          <p>Use HTML comments to mark variable-specific Markdown spans:</p>
           <pre
           ><code class="md"><span class="hl-7">&lt;!-- agentic:if agent=codex --&gt;</span><br/><span class="hl-1">Codex-only content.</span><br/><span class="hl-7">&lt;!-- agentic:endif --&gt;</span>
 </code><button type="button">Copy</button></pre>
 
-          <p>
-            The <code>agent=</code> value is a comma-separated list. Whitespace around each agent name is ignored, and
-            matching is case-sensitive.
-          </p>
+          <p>They may also appear inline:</p>
           <pre
-          ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1">, </span><span class="hl-4">markdown</span><span class="hl-1">);</span>
+          ><code class="md"><span class="hl-1">Use &lt;!-- agentic:if agent=codex --&gt;Codex&lt;!-- agentic:endif --&gt; instructions.</span>
 </code><button type="button">Copy</button></pre>
 
-          <p>A block is kept when the requested agent appears in its <code>agent=</code> list.</p>
           <p>
-            Directives must be on their own line. Inline HTML comments are treated as normal Markdown content. Nested
+            The <code>agentic:if</code> value is a <code>variable=value</code> condition. Use <code>|</code> to match
+            any of multiple values. Matching is case-sensitive.
+          </p>
+          <pre
+          ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, { </span><span class="hl-4">agent:</span><span class="hl-1"> </span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1"> });</span>
+</code><button type="button">Copy</button></pre>
+
+          <p>A block is kept when the configured variable matches one of the expected values.</p>
+          <p>
+            Use <code>agentic:var</code> comments to replace variables. They may appear inline or on their own line:
+          </p>
+          <pre><code class="md"><span class="hl-1">Project: &lt;!-- agentic:var projectName --&gt;</span>
+</code><button type="button">Copy</button></pre>
+
+          <pre
+          ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-4">projectName:</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+          <p>Missing variables throw an error, both in <code>agentic:if</code> and <code>agentic:var</code>.</p>
+          <p>
+            When condition comments are on their own line, the whole directive line is removed. Inline condition
+            comments only remove the comment itself, or the excluded span when the agent does not match. Nested
             condition blocks are not supported in this first version; malformed blocks throw an error.
           </p>
         </div>

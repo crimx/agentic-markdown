@@ -64,12 +64,16 @@
             <li class="">
               <div class="tsd-signature tsd-anchor-link" id="render">
                 <span class="tsd-kind-call-signature">render</span><span class="tsd-signature-symbol">(</span
-                ><span class="tsd-kind-parameter">agent</span><span class="tsd-signature-symbol">:</span>
+                ><span class="tsd-kind-parameter">markdown</span><span class="tsd-signature-symbol">:</span>
                 <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span>
-                <span class="tsd-kind-parameter">markdown</span><span class="tsd-signature-symbol">:</span>
-                <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span
-                ><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span
-                ><a href="#render" aria-label="Permalink" class="tsd-anchor-icon"
+                <span class="tsd-kind-parameter">variables</span><span class="tsd-signature-symbol">?:</span>
+                <a href="../types/RenderVariables.html" class="tsd-signature-type tsd-kind-type-alias"
+                  >RenderVariables</a
+                ><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span>
+                <span class="tsd-signature-type">string</span><a
+                  href="#render"
+                  aria-label="Permalink"
+                  class="tsd-anchor-icon"
                   ><svg viewBox="0 0 24 24" aria-hidden="true">
                     <use href="../assets/icons.svg#icon-anchor"></use>
                   </svg></a
@@ -78,24 +82,20 @@
               <div class="tsd-description">
                 <div class="tsd-comment tsd-typography">
                   <p>
-                    Generates Markdown for a target agent by evaluating full-line <code>agentic:if</code>
-                    comment blocks.
+                    Generates Markdown by evaluating <code>agentic:if</code> comments and replacing
+                    <code>agentic:var</code>
+                    comments from a shared variable map.
                   </p>
                   <p>
-                    Matching blocks are kept with their directive lines removed. Non-matching blocks are removed
-                    entirely, while content outside conditional blocks is preserved unchanged.
+                    Matching blocks are kept with their directive comments removed. Non-matching blocks are removed
+                    entirely, while kept content is preserved with any
+                    <code>agentic:var</code>
+                    comments replaced by configured variables.
                   </p>
                 </div>
                 <div class="tsd-parameters">
                   <h4 class="tsd-parameters-title">Parameters</h4>
                   <ul class="tsd-parameter-list">
-                    <li>
-                      <span
-                        ><span class="tsd-kind-parameter">agent</span>:
-                        <span class="tsd-signature-type">string</span></span
-                      >
-                      <div class="tsd-comment tsd-typography"><p>Target agent name.</p></div>
-                    </li>
                     <li>
                       <span
                         ><span class="tsd-kind-parameter">markdown</span>:
@@ -105,10 +105,21 @@
                         <p>Markdown source containing optional comment directives.</p>
                       </div>
                     </li>
+                    <li>
+                      <span
+                        ><span class="tsd-kind-parameter">variables</span>:
+                        <a href="../types/RenderVariables.html" class="tsd-signature-type tsd-kind-type-alias"
+                          >RenderVariables</a
+                        ><span class="tsd-signature-symbol"> = { }</span></span
+                      >
+                      <div class="tsd-comment tsd-typography">
+                        <p>Variables used by <code>agentic:if</code> and <code>agentic:var</code>.</p>
+                      </div>
+                    </li>
                   </ul>
                 </div>
                 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-                <p>Markdown filtered for the requested agent.</p>
+                <p>Rendered Markdown.</p>
                 <div class="tsd-comment tsd-typography">
                   <div class="tsd-tag-throws">
                     <h4 class="tsd-anchor-link" id="throws">
@@ -120,7 +131,8 @@
                     </h4>
                     <p>
                       If an <code>agentic:if</code> directive is malformed, nested, unclosed, or if an
-                      <code>agentic:endif</code> directive appears without a matching <code>agentic:if</code>.
+                      <code>agentic:endif</code> directive appears without a matching <code>agentic:if</code>. Also
+                      throws if an emitted directive references a missing variable.
                     </p>
                   </div>
                   <div class="tsd-tag-example">
@@ -132,7 +144,7 @@
                       >
                     </h4>
                     <pre
-                    ><code class="ts"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">render</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">output</span><span class="hl-1"> = </span><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1">, </span><span class="hl-4">markdown</span><span class="hl-1">);</span>
+                    ><code class="ts"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">render</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">output</span><span class="hl-1"> = </span><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-4">agent:</span><span class="hl-1"> </span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">projectName:</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
 </code><button type="button">Copy</button></pre>
                   </div>
                 </div>
@@ -141,8 +153,8 @@
                     <li>
                       Defined in
                       <a
-                        href="https://github.com/crimx/agentic-markdown/blob/6922a6c590b4cd40d8bb81049d94b67fef0141e0/src/render.ts#L36"
-                        >render.ts:36</a
+                        href="https://github.com/crimx/agentic-markdown/blob/88c4ca905694bf5efc18e91a03da5738c70d0e9c/src/render.ts#L33"
+                        >render.ts:33</a
                       >
                     </li>
                   </ul>
