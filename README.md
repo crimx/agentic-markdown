@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/crimx/agentic-markdown/actions/workflows/build.yml/badge.svg)](https://github.com/crimx/agentic-markdown/actions/workflows/build.yml)
 [![npm-version](https://img.shields.io/npm/v/agentic-markdown.svg)](https://www.npmjs.com/package/agentic-markdown)
 [![Coverage Status](https://crimx.github.io/agentic-markdown/coverage-badges/agentic-markdown.svg)](https://crimx.github.io/agentic-markdown/coverage/)
-[![minified-size](https://img.shields.io/bundlephobia/minzip/agentic-markdown)](https://bundlephobia.com/package/agentic-markdown)
+[![minified-size](https://deno.bundlejs.com/badge?q=agentic-markdown&treeshake=[*])](https://bundlejs.com/?q=agentic-markdown&treeshake=%5B*%5D)
 
 Render agent-specific Markdown from conditional HTML comment blocks.
 
