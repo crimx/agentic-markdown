@@ -1,0 +1,32 @@
+{
+  "language": "en",
+  "words": [
+    "abortable",
+    "coverallsapp",
+    "CRIMX",
+    "Dataless",
+    "hyrious",
+    "jsdelivr",
+    "lcov",
+    "Parens",
+    "pnpm",
+    "preinstall",
+    "agentic",
+    "treeshake",
+    "tsup",
+    "typedoc",
+    "Vals",
+    "vite",
+    "vitest",
+    "wopjs",
+    "yoctocolors"
+  ],
+  "ignorePaths": [
+    "**/coverage/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "cspell.config.js",
+    "pnpm-lock.yaml",
+    "CHANGELOG.md"
+  ]
+}
