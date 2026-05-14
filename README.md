@@ -6,7 +6,7 @@
 [![Coverage Status](https://crimx.github.io/agentic-markdown/coverage-badges/agentic-markdown.svg)](https://crimx.github.io/agentic-markdown/coverage/)
 [![minified-size](https://deno.bundlejs.com/badge?q=agentic-markdown&treeshake=[*])](https://bundlejs.com/?q=agentic-markdown&treeshake=%5B*%5D)
 
-Render agent-specific Markdown from conditional HTML comment blocks.
+Render variable-aware Markdown from conditional HTML comment blocks.
 
 ## Install
 
@@ -21,16 +21,21 @@ import { render } from "agentic-markdown";
 
 const markdown = `Common content.
 
+Project: <!-- agentic:var projectName -->
+
 <!-- agentic:if agent=codex -->
 Codex-only content.
 <!-- agentic:endif -->
 
-<!-- agentic:if agent=claude,gemini -->
+<!-- agentic:if agent=claude|gemini -->
 Claude and Gemini content.
 <!-- agentic:endif -->
 `;
 
-const output = render("codex", markdown);
+const output = render(markdown, {
+  agent: "codex",
+  projectName: "agentic-markdown",
+});
 ```
 
 `output`:
@@ -38,12 +43,14 @@ const output = render("codex", markdown);
 ```md
 Common content.
 
+Project: agentic-markdown
+
 Codex-only content.
 ```
 
 ## Syntax
 
-Use full-line HTML comments to mark agent-specific Markdown blocks:
+Use HTML comments to mark variable-specific Markdown spans:
 
 ```md
 <!-- agentic:if agent=codex -->
@@ -51,14 +58,35 @@ Codex-only content.
 <!-- agentic:endif -->
 ```
 
-The `agent=` value is a comma-separated list. Whitespace around each agent name is ignored, and matching is
+They may also appear inline:
+
+```md
+Use <!-- agentic:if agent=codex -->Codex<!-- agentic:endif --> instructions.
+```
+
+The `agentic:if` value is a `variable=value` condition. Use `|` to match any of multiple values. Matching is
 case-sensitive.
 
 ```ts
-render("codex", markdown);
+render(markdown, { agent: "codex" });
 ```
 
-A block is kept when the requested agent appears in its `agent=` list.
+A block is kept when the configured variable matches one of the expected values.
 
-Directives must be on their own line. Inline HTML comments are treated as normal Markdown content. Nested condition
-blocks are not supported in this first version; malformed blocks throw an error.
+Use `agentic:var` comments to replace variables. They may appear inline or on their own line:
+
+```md
+Project: <!-- agentic:var projectName -->
+```
+
+```ts
+render(markdown, {
+  projectName: "agentic-markdown",
+});
+```
+
+Missing variables throw an error, both in `agentic:if` and `agentic:var`.
+
+When condition comments are on their own line, the whole directive line is removed. Inline condition comments only
+remove the comment itself, or the excluded span when the agent does not match. Nested condition blocks are not supported
+in this first version; malformed blocks throw an error.

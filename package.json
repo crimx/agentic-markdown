@@ -2,7 +2,7 @@
   "name": "agentic-markdown",
   "version": "0.0.1",
   "private": false,
-  "description": "Render agent-specific Markdown from conditional comment blocks.",
+  "description": "Render variable-aware Markdown from conditional comment blocks.",
   "keywords": [
     "agent",
     "markdown",
