@@ -123,15 +123,21 @@
 </code><button type="button">Copy</button></pre>
 
           <p>
-            The <code>agentic:if</code> value is either a <code>variable=value</code> condition or a presence check. Use
-            <code>|</code> to match any of multiple values. Matching is case-sensitive.
+            The <code>agentic:if</code> value is either a <code>variable=value</code> condition or a presence/non-empty
+            check. Use <code>|</code> to match any of multiple values. Matching is case-sensitive.
           </p>
           <pre
           ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, { </span><span class="hl-4">agent:</span><span class="hl-1"> </span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1"> });</span>
 </code><button type="button">Copy</button></pre>
 
-          <p>A block is kept when the configured variable matches one of the expected values.</p>
-          <p>Omit <code>=</code> to keep a block when the configured variable has a non-empty value:</p>
+          <p>
+            A <code>variable=value</code> block is kept when the configured variable matches one of the expected values.
+            Missing variables are treated as non-matches instead of errors.
+          </p>
+          <p>
+            Omit <code>=</code> to keep a block when the configured variable has a non-empty value. Missing or empty
+            variables are also treated as non-matches:
+          </p>
           <pre
           ><code class="md"><span class="hl-7">&lt;!-- agentic:if projectName --&gt;</span><br/><span class="hl-1">Project-specific content.</span><br/><span class="hl-7">&lt;!-- agentic:endif --&gt;</span>
 </code><button type="button">Copy</button></pre>
@@ -146,7 +152,7 @@
           ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-4">projectName:</span><span class="hl-1"> </span><span class="hl-2">&quot;agentic-markdown&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
 </code><button type="button">Copy</button></pre>
 
-          <p>Missing variables throw an error, both in <code>agentic:if</code> and <code>agentic:var</code>.</p>
+          <p><code>agentic:var</code> requires the variable to be configured. Missing variables throw an error.</p>
           <p>
             When condition comments are on their own line, the whole directive line is removed. Inline condition
             comments only remove the comment itself, or the excluded span when the agent does not match. Nested
