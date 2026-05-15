@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.3](https://github.com/crimx/agentic-markdown/compare/v0.0.2...v0.0.3) (2026-05-15)
+
+
+### Bug Fixes
+
+* enhance presence-only condition handling in render function and tests ([ac3540d](https://github.com/crimx/agentic-markdown/commit/ac3540d19501d12b16f1bc0d68ecd5c0745d0c44))
+
 ## 0.0.2 (2026-05-14)
 
 

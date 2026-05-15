@@ -1,6 +1,6 @@
 {
   "name": "agentic-markdown",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "description": "Render variable-aware Markdown from conditional comment blocks.",
   "keywords": [
