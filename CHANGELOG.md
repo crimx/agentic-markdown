@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.4](https://github.com/crimx/agentic-markdown/compare/v0.0.3...v0.0.4) (2026-05-15)
+
+
+### Bug Fixes
+
+* improve handling of missing variables in agentic directives and update related tests ([1475f2f](https://github.com/crimx/agentic-markdown/commit/1475f2f399793d99ad8b74593377263b0d5891ae))
+
 ## [0.0.3](https://github.com/crimx/agentic-markdown/compare/v0.0.2...v0.0.3) (2026-05-15)
 
 
