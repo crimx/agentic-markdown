@@ -61,9 +61,6 @@
             >
           </h1>
           <p>
-            <a href="https://crimx.github.io/agentic-markdown"
-              ><img src="https://img.shields.io/badge/Docs-read-%23fdf9f5" alt="Docs"></a
-            >
             <a href="https://github.com/crimx/agentic-markdown/actions/workflows/build.yml"
               ><img
                 src="https://github.com/crimx/agentic-markdown/actions/workflows/build.yml/badge.svg"
@@ -126,14 +123,19 @@
 </code><button type="button">Copy</button></pre>
 
           <p>
-            The <code>agentic:if</code> value is a <code>variable=value</code> condition. Use <code>|</code> to match
-            any of multiple values. Matching is case-sensitive.
+            The <code>agentic:if</code> value is either a <code>variable=value</code> condition or a presence check. Use
+            <code>|</code> to match any of multiple values. Matching is case-sensitive.
           </p>
           <pre
           ><code class="ts"><span class="hl-0">render</span><span class="hl-1">(</span><span class="hl-4">markdown</span><span class="hl-1">, { </span><span class="hl-4">agent:</span><span class="hl-1"> </span><span class="hl-2">&quot;codex&quot;</span><span class="hl-1"> });</span>
 </code><button type="button">Copy</button></pre>
 
           <p>A block is kept when the configured variable matches one of the expected values.</p>
+          <p>Omit <code>=</code> to keep a block when the configured variable has a non-empty value:</p>
+          <pre
+          ><code class="md"><span class="hl-7">&lt;!-- agentic:if projectName --&gt;</span><br/><span class="hl-1">Project-specific content.</span><br/><span class="hl-7">&lt;!-- agentic:endif --&gt;</span>
+</code><button type="button">Copy</button></pre>
+
           <p>
             Use <code>agentic:var</code> comments to replace variables. They may appear inline or on their own line:
           </p>
