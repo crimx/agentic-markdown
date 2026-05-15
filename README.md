@@ -63,16 +63,18 @@ They may also appear inline:
 Use <!-- agentic:if agent=codex -->Codex<!-- agentic:endif --> instructions.
 ```
 
-The `agentic:if` value is either a `variable=value` condition or a presence check. Use `|` to match any of multiple
-values. Matching is case-sensitive.
+The `agentic:if` value is either a `variable=value` condition or a presence/non-empty check. Use `|` to match any of
+multiple values. Matching is case-sensitive.
 
 ```ts
 render(markdown, { agent: "codex" });
 ```
 
-A block is kept when the configured variable matches one of the expected values.
+A `variable=value` block is kept when the configured variable matches one of the expected values. Missing variables are
+treated as non-matches instead of errors.
 
-Omit `=` to keep a block when the configured variable has a non-empty value:
+Omit `=` to keep a block when the configured variable has a non-empty value. Missing or empty variables are also treated
+as non-matches:
 
 ```md
 <!-- agentic:if projectName -->
@@ -92,7 +94,7 @@ render(markdown, {
 });
 ```
 
-Missing variables throw an error, both in `agentic:if` and `agentic:var`.
+`agentic:var` requires the variable to be configured. Missing variables throw an error.
 
 When condition comments are on their own line, the whole directive line is removed. Inline condition comments only
 remove the comment itself, or the excluded span when the agent does not match. Nested condition blocks are not supported

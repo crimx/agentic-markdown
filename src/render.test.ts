@@ -200,10 +200,17 @@ describe("render", () => {
     expect(() => render("<!-- agentic:if agent codex -->\n")).toThrow("Invalid agentic:if directive at line 1");
   });
 
-  it("throws for missing if variables", () => {
-    expect(() => render("<!-- agentic:if agent=codex -->\nCodex-only content.\n<!-- agentic:endif -->\n")).toThrow(
-      'Missing agentic:if variable "agent" at line 1',
-    );
+  it("removes value condition blocks when the variable is missing", () => {
+    const markdown = [
+      "Before.",
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:endif -->",
+      "After.",
+      "",
+    ].join("\n");
+
+    expect(render(markdown)).toBe("Before.\nAfter.\n");
   });
 
   it("throws for unknown agentic directives", () => {

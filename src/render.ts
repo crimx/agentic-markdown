@@ -18,7 +18,7 @@ export type RenderVariables = Record<string, string>;
  * @returns Rendered Markdown.
  * @throws If an `agentic:if` directive is malformed, nested, unclosed, or if
  * an `agentic:endif` directive appears without a matching `agentic:if`. Also
- * throws if an emitted directive references a missing variable.
+ * throws if an emitted `agentic:var` directive references a missing variable.
  *
  * @example
  * ```ts
@@ -120,10 +120,6 @@ function matchesCondition(args: string, variables: RenderVariables, lineNumber: 
 
   if (expectedValues.some(isInvalidValue)) {
     throwInvalidIfDirective(lineNumber);
-  }
-
-  if (value === undefined) {
-    throw new Error(`Missing agentic:if variable "${name}" at line ${lineNumber}.`);
   }
 
   return expectedValues.includes(value);
