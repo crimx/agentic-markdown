@@ -1,6 +1,5 @@
 # agentic-markdown
 
-[![Docs](https://img.shields.io/badge/Docs-read-%23fdf9f5)](https://crimx.github.io/agentic-markdown)
 [![Build Status](https://github.com/crimx/agentic-markdown/actions/workflows/build.yml/badge.svg)](https://github.com/crimx/agentic-markdown/actions/workflows/build.yml)
 [![npm-version](https://img.shields.io/npm/v/agentic-markdown.svg)](https://www.npmjs.com/package/agentic-markdown)
 [![Coverage Status](https://crimx.github.io/agentic-markdown/coverage-badges/agentic-markdown.svg)](https://crimx.github.io/agentic-markdown/coverage/)
@@ -64,14 +63,22 @@ They may also appear inline:
 Use <!-- agentic:if agent=codex -->Codex<!-- agentic:endif --> instructions.
 ```
 
-The `agentic:if` value is a `variable=value` condition. Use `|` to match any of multiple values. Matching is
-case-sensitive.
+The `agentic:if` value is either a `variable=value` condition or a presence check. Use `|` to match any of multiple
+values. Matching is case-sensitive.
 
 ```ts
 render(markdown, { agent: "codex" });
 ```
 
 A block is kept when the configured variable matches one of the expected values.
+
+Omit `=` to keep a block when the configured variable has a non-empty value:
+
+```md
+<!-- agentic:if projectName -->
+Project-specific content.
+<!-- agentic:endif -->
+```
 
 Use `agentic:var` comments to replace variables. They may appear inline or on their own line:
 

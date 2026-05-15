@@ -38,6 +38,12 @@ describe("render", () => {
     expect(render(markdown, { agent: "claude" })).toBe("Common content.\n\n\nTail.\n");
   });
 
+  it("throws for an unclosed non-matching condition block at the end of the document", () => {
+    const markdown = ["Before.", "<!-- agentic:if agent=codex -->", "Codex-only content."].join("\n");
+
+    expect(() => render(markdown, { agent: "claude" })).toThrow("Unclosed agentic:if starting at line 2");
+  });
+
   it("keeps blocks when any expected variable value matches", () => {
     const markdown = [
       "<!-- agentic:if agent=claude|codex -->",
@@ -55,6 +61,26 @@ describe("render", () => {
     );
 
     expect(render(markdown, { target: "docs" })).toBe("Docs content.\n");
+  });
+
+  it("keeps presence-only condition blocks when the variable has a value", () => {
+    const markdown = ["<!-- agentic:if projectName -->", "Project content.", "<!-- agentic:endif -->", ""].join("\n");
+
+    expect(render(markdown, { projectName: "agentic-markdown" })).toBe("Project content.\n");
+  });
+
+  it("removes presence-only condition blocks when the variable is missing or empty", () => {
+    const markdown = [
+      "Before.",
+      "<!-- agentic:if projectName -->",
+      "Project content.",
+      "<!-- agentic:endif -->",
+      "After.",
+      "",
+    ].join("\n");
+
+    expect(render(markdown)).toBe("Before.\nAfter.\n");
+    expect(render(markdown, { projectName: "" })).toBe("Before.\nAfter.\n");
   });
 
   it("handles multiple independent condition blocks", () => {
@@ -77,6 +103,25 @@ describe("render", () => {
     const markdown = "A <!-- agentic:if agent=codex -->B<!-- agentic:endif --> C\n";
 
     expect(render(markdown, { agent: "codex" })).toBe("A B C\n");
+  });
+
+  it("removes a standalone condition comment at the end of the document", () => {
+    const markdown = "Before.\n<!-- agentic:if agent=codex -->";
+
+    expect(() => render(markdown, { agent: "codex" })).toThrow("Unclosed agentic:if starting at line 2");
+  });
+
+  it("removes standalone condition directive lines with CRLF line endings", () => {
+    const markdown =
+      "Before.\r\n<!-- agentic:if agent=codex -->\r\nCodex-only content.\r\n<!-- agentic:endif -->\r\nAfter.\r\n";
+
+    expect(render(markdown, { agent: "codex" })).toBe("Before.\r\nCodex-only content.\r\nAfter.\r\n");
+  });
+
+  it("keeps same-line content after standalone-looking condition comments", () => {
+    const markdown = "<!-- agentic:if agent=codex --> B\nC<!-- agentic:endif --> D\n";
+
+    expect(render(markdown, { agent: "codex" })).toBe(" B\nC D\n");
   });
 
   it("removes non-matching inline condition spans", () => {
@@ -123,6 +168,12 @@ describe("render", () => {
 
   it("throws for an isolated endif directive", () => {
     expect(() => render("<!-- agentic:endif -->\n")).toThrow("Unexpected agentic:endif at line 1");
+  });
+
+  it("throws for endif directives with arguments", () => {
+    expect(() => render("<!-- agentic:if agent=codex -->\n<!-- agentic:endif agent -->\n", { agent: "codex" })).toThrow(
+      "Invalid agentic directive at line 2",
+    );
   });
 
   it("throws for an unclosed if directive", () => {

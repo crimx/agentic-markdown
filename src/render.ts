@@ -103,10 +103,17 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
 }
 
 function matchesCondition(args: string, variables: RenderVariables, lineNumber: number): boolean {
-  const [name = "", valueList = "", extra = ""] = args.trim().split("=");
+  const parts = args.trim().split("=");
+  const [name, valueList] = parts;
 
-  if (extra !== "" || isInvalidName(name)) {
+  if (parts.length > 2 || isInvalidName(name)) {
     throwInvalidIfDirective(lineNumber);
+  }
+
+  const value = variables[name];
+
+  if (valueList === undefined) {
+    return value !== undefined && value !== "";
   }
 
   const expectedValues = valueList.split("|");
@@ -114,8 +121,6 @@ function matchesCondition(args: string, variables: RenderVariables, lineNumber: 
   if (expectedValues.some(isInvalidValue)) {
     throwInvalidIfDirective(lineNumber);
   }
-
-  const value = variables[name];
 
   if (value === undefined) {
     throw new Error(`Missing agentic:if variable "${name}" at line ${lineNumber}.`);
@@ -178,7 +183,7 @@ function getControlDirectiveSpan(markdown: string, start: number, end: number): 
 
 function throwInvalidIfDirective(lineNumber: number): never {
   throw new Error(
-    `Invalid agentic:if directive at line ${lineNumber}. Expected: <!-- agentic:if agent=codex|claude -->`,
+    `Invalid agentic:if directive at line ${lineNumber}. Expected: <!-- agentic:if agent=codex|claude --> or <!-- agentic:if agent -->`,
   );
 }
 
