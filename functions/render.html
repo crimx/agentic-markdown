@@ -82,9 +82,9 @@
               <div class="tsd-description">
                 <div class="tsd-comment tsd-typography">
                   <p>
-                    Generates Markdown by evaluating <code>agentic:if</code> comments and replacing
-                    <code>agentic:var</code>
-                    comments from a shared variable map.
+                    Renders a Markdown-first template by evaluating <code>agentic:if</code>/<code>agentic:elseif</code>/
+                    <code>agentic:else</code>
+                    comments and replacing <code>agentic:var</code> comments from a shared variable map.
                   </p>
                   <p>
                     Matching blocks are kept with their directive comments removed. Non-matching blocks are removed
@@ -102,7 +102,7 @@
                         <span class="tsd-signature-type">string</span></span
                       >
                       <div class="tsd-comment tsd-typography">
-                        <p>Markdown source containing optional comment directives.</p>
+                        <p>Markdown template containing optional comment directives.</p>
                       </div>
                     </li>
                     <li>
@@ -113,7 +113,10 @@
                         ><span class="tsd-signature-symbol"> = { }</span></span
                       >
                       <div class="tsd-comment tsd-typography">
-                        <p>Variables used by <code>agentic:if</code> and <code>agentic:var</code>.</p>
+                        <p>
+                          Variables used by condition and <code>agentic:var</code>
+                          directives.
+                        </p>
                       </div>
                     </li>
                   </ul>
@@ -130,9 +133,11 @@
                       >
                     </h4>
                     <p>
-                      If an <code>agentic:if</code> directive is malformed, nested, unclosed, or if an
-                      <code>agentic:endif</code> directive appears without a matching <code>agentic:if</code>. Also
-                      throws if an emitted <code>agentic:var</code> directive references a missing variable.
+                      If an <code>agentic:if</code> directive is malformed, nested, unclosed, or if a branch/<code
+                        >agentic:endif</code
+                      >
+                      directive appears without a matching <code>agentic:if</code>. Also throws if an emitted
+                      <code>agentic:var</code> directive references a missing variable.
                     </p>
                   </div>
                   <div class="tsd-tag-example">
@@ -153,8 +158,8 @@
                     <li>
                       Defined in
                       <a
-                        href="https://github.com/crimx/agentic-markdown/blob/abd7c759cabe8099bf8be65b7a5134d2185aeaca/src/render.ts#L33"
-                        >render.ts:33</a
+                        href="https://github.com/crimx/agentic-markdown/blob/f6528024b497e2a5b3b27e713f8bcb7447573a3a/src/render.ts#L36"
+                        >render.ts:36</a
                       >
                     </li>
                   </ul>
