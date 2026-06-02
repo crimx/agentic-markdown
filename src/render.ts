@@ -6,14 +6,15 @@ const whitespacePattern = /\s/;
 export type RenderVariables = Record<string, string>;
 
 /**
- * Generates Markdown by evaluating `agentic:if`/`agentic:elseif`/`agentic:else`
- * comments and replacing `agentic:var` comments from a shared variable map.
+ * Renders a Markdown-first template by evaluating `agentic:if`/`agentic:elseif`/
+ * `agentic:else` comments and replacing `agentic:var` comments from a shared
+ * variable map.
  *
  * Matching blocks are kept with their directive comments removed. Non-matching
  * blocks are removed entirely, while kept content is preserved with any
  * `agentic:var` comments replaced by configured variables.
  *
- * @param markdown - Markdown source containing optional comment directives.
+ * @param markdown - Markdown template containing optional comment directives.
  * @param variables - Variables used by condition and `agentic:var`
  * directives.
  * @returns Rendered Markdown.

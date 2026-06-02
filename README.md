@@ -5,7 +5,9 @@
 [![Coverage Status](https://crimx.github.io/agentic-markdown/coverage-badges/agentic-markdown.svg)](https://crimx.github.io/agentic-markdown/coverage/)
 [![minified-size](https://deno.bundlejs.com/badge?q=agentic-markdown&treeshake=[*])](https://bundlejs.com/?q=agentic-markdown&treeshake=%5B*%5D)
 
-Render variable-aware Markdown from conditional HTML comment blocks.
+A tiny Markdown-first template engine for variables and conditional content.
+
+Directives live in HTML comments to avoid colliding with Markdown content or other template syntaxes.
 
 ## Install
 
@@ -49,7 +51,7 @@ Codex-only content.
 
 ## Syntax
 
-Use HTML comments to mark variable-specific Markdown spans:
+Use HTML comment directives to mark conditional Markdown spans:
 
 ```md
 <!-- agentic:if agent=codex -->
