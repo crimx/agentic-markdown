@@ -54,6 +54,10 @@ Use HTML comments to mark variable-specific Markdown spans:
 ```md
 <!-- agentic:if agent=codex -->
 Codex-only content.
+<!-- agentic:elseif agent=claude -->
+Claude-only content.
+<!-- agentic:else -->
+Other-agent content.
 <!-- agentic:endif -->
 ```
 
@@ -63,8 +67,9 @@ They may also appear inline:
 Use <!-- agentic:if agent=codex -->Codex<!-- agentic:endif --> instructions.
 ```
 
-The `agentic:if` value is either a `variable=value` condition or a presence/non-empty check. Use `|` to match any of
-multiple values. Matching is case-sensitive.
+The `agentic:if` and `agentic:elseif` values are either `variable=value` conditions or presence/non-empty checks. Use
+`|` to match any of multiple values. Matching is case-sensitive. `agentic:else` accepts no condition and is kept only
+when no previous branch in the chain matched.
 
 ```ts
 render(markdown, { agent: "codex" });
@@ -97,5 +102,5 @@ render(markdown, {
 `agentic:var` requires the variable to be configured. Missing variables throw an error.
 
 When condition comments are on their own line, the whole directive line is removed. Inline condition comments only
-remove the comment itself, or the excluded span when the agent does not match. Nested condition blocks are not supported
-in this first version; malformed blocks throw an error.
+remove the comment itself, or the excluded span when the condition does not match. Nested condition blocks are not
+supported; malformed blocks throw an error.

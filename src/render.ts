@@ -6,19 +6,21 @@ const whitespacePattern = /\s/;
 export type RenderVariables = Record<string, string>;
 
 /**
- * Generates Markdown by evaluating `agentic:if` comments and replacing
- * `agentic:var` comments from a shared variable map.
+ * Generates Markdown by evaluating `agentic:if`/`agentic:elseif`/`agentic:else`
+ * comments and replacing `agentic:var` comments from a shared variable map.
  *
  * Matching blocks are kept with their directive comments removed. Non-matching
  * blocks are removed entirely, while kept content is preserved with any
  * `agentic:var` comments replaced by configured variables.
  *
  * @param markdown - Markdown source containing optional comment directives.
- * @param variables - Variables used by `agentic:if` and `agentic:var`.
+ * @param variables - Variables used by condition and `agentic:var`
+ * directives.
  * @returns Rendered Markdown.
- * @throws If an `agentic:if` directive is malformed, nested, unclosed, or if
- * an `agentic:endif` directive appears without a matching `agentic:if`. Also
- * throws if an emitted `agentic:var` directive references a missing variable.
+ * @throws If an `agentic:if` directive is malformed, nested, unclosed, or if a
+ * branch/`agentic:endif` directive appears without a matching `agentic:if`.
+ * Also throws if an emitted `agentic:var` directive references a missing
+ * variable.
  *
  * @example
  * ```ts
@@ -34,6 +36,8 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
   const output: string[] = [];
   let cursor = 0;
   let blockMatches = true;
+  let blockHasMatched = false;
+  let blockHasElse = false;
   let blockStartLine: number | null = null;
   let match: RegExpExecArray | null;
 
@@ -42,7 +46,7 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
   while ((match = agenticCommentPattern.exec(markdown))) {
     const [comment, directive = "", args = ""] = match;
     const lineNumber = getLineNumber(markdown, match.index);
-    const isControlDirective = directive === "if" || directive === "endif";
+    const isControlDirective = ["if", "elseif", "else", "endif"].includes(directive);
     const span = isControlDirective
       ? getControlDirectiveSpan(markdown, match.index, match.index + comment.length)
       : { start: match.index, end: match.index + comment.length };
@@ -60,6 +64,42 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
 
       blockStartLine = lineNumber;
       blockMatches = matchesCondition(args, variables, lineNumber);
+      blockHasMatched = blockMatches;
+      blockHasElse = false;
+      continue;
+    }
+
+    if (directive === "elseif") {
+      if (blockStartLine === null) {
+        throw new Error(`Unexpected agentic:elseif at line ${lineNumber} without a matching agentic:if.`);
+      }
+
+      if (blockHasElse) {
+        throw new Error(`Unexpected agentic:elseif at line ${lineNumber} after agentic:else.`);
+      }
+
+      const branchMatches = matchesCondition(args, variables, lineNumber, directive);
+      blockMatches = !blockHasMatched && branchMatches;
+      blockHasMatched ||= branchMatches;
+      continue;
+    }
+
+    if (directive === "else") {
+      if (args.trim() !== "") {
+        throwInvalidDirective(lineNumber);
+      }
+
+      if (blockStartLine === null) {
+        throw new Error(`Unexpected agentic:else at line ${lineNumber} without a matching agentic:if.`);
+      }
+
+      if (blockHasElse) {
+        throw new Error(`Duplicate agentic:else at line ${lineNumber}.`);
+      }
+
+      blockHasElse = true;
+      blockMatches = !blockHasMatched;
+      blockHasMatched = true;
       continue;
     }
 
@@ -76,6 +116,8 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
 
       blockStartLine = null;
       blockMatches = true;
+      blockHasMatched = false;
+      blockHasElse = false;
       continue;
     }
 
@@ -86,9 +128,7 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
       continue;
     }
 
-    throw new Error(
-      `Invalid agentic directive at line ${lineNumber}. Expected agentic:if, agentic:endif, or agentic:var.`,
-    );
+    throwInvalidDirective(lineNumber);
   }
 
   if (blockStartLine === null || blockMatches) {
@@ -102,12 +142,12 @@ export function render(markdown: string, variables: RenderVariables = {}): strin
   return output.join("");
 }
 
-function matchesCondition(args: string, variables: RenderVariables, lineNumber: number): boolean {
+function matchesCondition(args: string, variables: RenderVariables, lineNumber: number, directive = "if"): boolean {
   const parts = args.trim().split("=");
   const [name, valueList] = parts;
 
   if (parts.length > 2 || isInvalidName(name)) {
-    throwInvalidIfDirective(lineNumber);
+    throwInvalidConditionDirective(lineNumber, directive);
   }
 
   const value = variables[name];
@@ -119,7 +159,7 @@ function matchesCondition(args: string, variables: RenderVariables, lineNumber: 
   const expectedValues = valueList.split("|");
 
   if (expectedValues.some(isInvalidValue)) {
-    throwInvalidIfDirective(lineNumber);
+    throwInvalidConditionDirective(lineNumber, directive);
   }
 
   return expectedValues.includes(value);
@@ -177,12 +217,18 @@ function getControlDirectiveSpan(markdown: string, start: number, end: number): 
   return { start: lineStart, end: lineEnd };
 }
 
-function throwInvalidIfDirective(lineNumber: number): never {
+function throwInvalidConditionDirective(lineNumber: number, directive: string): never {
   throw new Error(
-    `Invalid agentic:if directive at line ${lineNumber}. Expected: <!-- agentic:if agent=codex|claude --> or <!-- agentic:if agent -->`,
+    `Invalid agentic:${directive} directive at line ${lineNumber}. Expected: <!-- agentic:${directive} agent=codex|claude --> or <!-- agentic:${directive} agent -->`,
   );
 }
 
 function throwInvalidVarDirective(lineNumber: number): never {
   throw new Error(`Invalid agentic:var directive at line ${lineNumber}. Expected: <!-- agentic:var projectName -->`);
+}
+
+function throwInvalidDirective(lineNumber: number): never {
+  throw new Error(
+    `Invalid agentic directive at line ${lineNumber}. Expected agentic:if, agentic:elseif, agentic:else, agentic:endif, or agentic:var.`,
+  );
 }

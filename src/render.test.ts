@@ -99,6 +99,35 @@ describe("render", () => {
     expect(render(markdown, { agent: "codex" })).toBe("Common content.\nCodex-only content.\nTail.\n");
   });
 
+  it("keeps the first matching branch in condition chains", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:elseif agent=claude -->",
+      "Claude-only content.",
+      "<!-- agentic:elseif target=docs -->",
+      "Docs-only content.",
+      "<!-- agentic:else -->",
+      "Fallback content.",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(render(markdown, { agent: "codex", target: "docs" })).toBe("Codex-only content.\n");
+    expect(render(markdown, { agent: "claude", target: "docs" })).toBe("Claude-only content.\n");
+    expect(render(markdown, { agent: "gemini", target: "docs" })).toBe("Docs-only content.\n");
+    expect(render(markdown, { agent: "gemini", target: "readme" })).toBe("Fallback content.\n");
+  });
+
+  it("supports inline elseif and else branches", () => {
+    const markdown =
+      "Use <!-- agentic:if agent=codex -->Codex<!-- agentic:elseif agent=claude -->Claude<!-- agentic:else -->another agent<!-- agentic:endif --> instructions.\n";
+
+    expect(render(markdown, { agent: "codex" })).toBe("Use Codex instructions.\n");
+    expect(render(markdown, { agent: "claude" })).toBe("Use Claude instructions.\n");
+    expect(render(markdown, { agent: "gemini" })).toBe("Use another agent instructions.\n");
+  });
+
   it("keeps matching inline condition spans", () => {
     const markdown = "A <!-- agentic:if agent=codex -->B<!-- agentic:endif --> C\n";
 
@@ -166,8 +195,32 @@ describe("render", () => {
     expect(render(markdown, { agent: "codex" })).toBe("Tail.\n");
   });
 
+  it("does not evaluate variables in skipped condition chain branches", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex content.",
+      "<!-- agentic:elseif agent=claude -->",
+      "<!-- agentic:var missingProjectName -->",
+      "<!-- agentic:else -->",
+      "<!-- agentic:var missingFallback -->",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(render(markdown, { agent: "codex" })).toBe("Codex content.\n");
+  });
+
   it("throws for an isolated endif directive", () => {
     expect(() => render("<!-- agentic:endif -->\n")).toThrow("Unexpected agentic:endif at line 1");
+  });
+
+  it("throws for isolated condition chain branch directives", () => {
+    expect(() => render("<!-- agentic:elseif agent=codex -->\n")).toThrow(
+      "Unexpected agentic:elseif at line 1 without a matching agentic:if",
+    );
+    expect(() => render("<!-- agentic:else -->\n")).toThrow(
+      "Unexpected agentic:else at line 1 without a matching agentic:if",
+    );
   });
 
   it("throws for endif directives with arguments", () => {
@@ -200,6 +253,64 @@ describe("render", () => {
     expect(() => render("<!-- agentic:if agent codex -->\n")).toThrow("Invalid agentic:if directive at line 1");
   });
 
+  it("throws for invalid elseif directives", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:elseif agent= -->",
+      "Claude-only content.",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(() => render(markdown, { agent: "codex" })).toThrow("Invalid agentic:elseif directive at line 3");
+  });
+
+  it("throws for else directives with arguments", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:else agent=claude -->",
+      "Claude-only content.",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(() => render(markdown, { agent: "claude" })).toThrow("Invalid agentic directive at line 3");
+  });
+
+  it("throws for duplicate else branches", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:else -->",
+      "Fallback content.",
+      "<!-- agentic:else -->",
+      "Duplicate fallback content.",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(() => render(markdown, { agent: "gemini" })).toThrow("Duplicate agentic:else at line 5");
+  });
+
+  it("throws for elseif branches after else", () => {
+    const markdown = [
+      "<!-- agentic:if agent=codex -->",
+      "Codex-only content.",
+      "<!-- agentic:else -->",
+      "Fallback content.",
+      "<!-- agentic:elseif agent=claude -->",
+      "Claude-only content.",
+      "<!-- agentic:endif -->",
+      "",
+    ].join("\n");
+
+    expect(() => render(markdown, { agent: "claude" })).toThrow(
+      "Unexpected agentic:elseif at line 5 after agentic:else",
+    );
+  });
+
   it("removes value condition blocks when the variable is missing", () => {
     const markdown = [
       "Before.",
@@ -214,7 +325,7 @@ describe("render", () => {
   });
 
   it("throws for unknown agentic directives", () => {
-    expect(() => render("<!-- agentic:else -->\n")).toThrow("Invalid agentic directive at line 1");
+    expect(() => render("<!-- agentic:unknown -->\n")).toThrow("Invalid agentic directive at line 1");
   });
 
   it("throws for missing variables", () => {
